@@ -31,6 +31,25 @@ Faye.Extensible = {
       else pipe(message);
     };
     pipe(message);
+  },
+
+  addService: function(serviceName, service) {
+	this._services = this._services || {};
+	this._services[serviceName] = service;
+  },
+
+  removeService: function(serviceName) {
+	if(!this._services) return;
+
+	delete !this._services[serviceName];
+  },
+
+  callService: function(serviceName, data, callback){
+	if(!this._services || !this._services[serviceName]) {
+		return callback({ error: 'Service does not exist.'});
+	}
+
+	this._services[serviceName](data, callback);
   }
 };
 

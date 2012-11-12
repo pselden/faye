@@ -86,6 +86,9 @@ Faye.Server = Faye.Class({
     if (Faye.Channel.isMeta(channelName))
       return this._handleMeta(message, local, callback, context);
     
+	if (Faye.Channel.isService(channelName))
+	  return this._handleService(message, local, callback, context);
+
     if (!Faye.Grammar.CHANNEL_NAME.test(channelName))
       error = Faye.Error.channelInvalid(channelName);
     
@@ -106,6 +109,18 @@ Faye.Server = Faye.Class({
       for (var i = 0, n = responses.length; i < n; i++) this._advize(responses[i], message.connectionType);
       callback.call(context, responses);
     }, this);
+  },
+
+  _handleService: function(message, local, callback, context) {
+    var parsedChannel = Faye.Channel.parse(message.channel);
+    parsedChannel.shift();
+    var serviceName = parsedChannel.join('/');
+    this.callService(serviceName, message.serviceData, function(serviceResponse) {
+      message.error = serviceResponse.error;
+      var response = context._makeResponse(message);
+      response.serviceResponse = serviceResponse;
+      callback.call(context, [response]);
+    });
   },
   
   _advize: function(response, connectionType) {

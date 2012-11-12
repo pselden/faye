@@ -298,6 +298,21 @@ Faye.Client = Faye.Class({
     
     return publication;
   },
+
+  service: function(service, data, callback){
+    var channel = '/service/' + service;
+	this.connect(function() {
+	  this.info('Client ? queueing service message to ?: ?', this._clientId, channel, data);
+
+	  this._send({
+	    channel:      channel,
+	    serviceData:  data,
+	    clientId:     this._clientId
+	  }, function(response) {
+	    if(callback) callback(response.serviceResponse);
+	  }, this);
+	}, this);
+  },
   
   receiveMessage: function(message) {
     this.pipeThroughExtensions('incoming', message, function(message) {
