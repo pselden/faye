@@ -115,7 +115,7 @@ Faye.Server = Faye.Class({
     var parsedChannel = Faye.Channel.parse(message.channel);
     parsedChannel.shift();
     var serviceName = parsedChannel.join('/');
-    this.callService(serviceName, message.serviceData, function(serviceResponse) {
+    this.callService(serviceName, message, function(serviceResponse) {
       message.error = serviceResponse.error;
       var response = context._makeResponse(message);
       response.serviceResponse = serviceResponse;
